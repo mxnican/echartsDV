@@ -1,8 +1,36 @@
 export const coreMetrics = [
-  { label: '总访问量 PV', value: '12,345,678', unit: '次', icon: 'trend-up', accent: '#2fe4ff' },
-  { label: '总用户数 UV', value: '2,345,678', unit: '人', icon: 'user', accent: '#4ea5ff' },
-  { label: '订单总数', value: '56,789', unit: '单', icon: 'order', accent: '#6af0c8' },
-  { label: '销售额', value: '8,765,432', unit: '元', icon: 'money', accent: '#ffd86b' },
+  {
+    label: '总访问量 PV',
+    value: '12,345,678',
+    unit: '次',
+    icon: 'trend-up',
+    accent: '#2fe4ff',
+    delta: '12.45%',
+  },
+  {
+    label: '总用户数 UV',
+    value: '2,345,678',
+    unit: '人',
+    icon: 'user',
+    accent: '#4ea5ff',
+    delta: '8.21%',
+  },
+  {
+    label: '订单总数',
+    value: '56,789',
+    unit: '单',
+    icon: 'order',
+    accent: '#6af0c8',
+    delta: '6.72%',
+  },
+  {
+    label: '销售额',
+    value: '8,765,432',
+    unit: '元',
+    icon: 'money',
+    accent: '#ffd86b',
+    delta: '11.23%',
+  },
 ]
 
 export const pvUvTrend = {
@@ -22,24 +50,36 @@ export const userProfileRadar = {
   value: [92, 78, 66, 72, 84],
 }
 
-export const deviceDistribution = [
-  { name: 'PC端', value: 45.32 },
-  { name: '移动端', value: 42.18 },
-  { name: '平板端', value: 8.35 },
-  { name: '其他', value: 4.15 },
-]
-
 export const centerSummary = [
-  { label: '今日新增用户', value: '23,456', accent: '#2fe4ff' },
-  { label: '今日新增订单', value: '1,234', accent: '#4ea5ff' },
-  { label: '今日成交额', value: '567,890', accent: '#6af0c8' },
-  { label: '活跃用户数', value: '678,901', accent: '#ffd86b' },
+  {
+    label: '今日新增用户',
+    value: '23,456',
+    accent: '#2fe4ff',
+    icon: 'user',
+    delta: '12.35%',
+  },
+  {
+    label: '今日新增订单',
+    value: '1,234',
+    accent: '#4ea5ff',
+    icon: 'order',
+    delta: '9.21%',
+  },
+  {
+    label: '今日成交额',
+    value: '567,890',
+    accent: '#6af0c8',
+    icon: 'money',
+    delta: '8.65%',
+  },
+  {
+    label: '活跃用户数',
+    value: '678,901',
+    accent: '#ffd86b',
+    icon: 'active',
+    delta: '7.32%',
+  },
 ]
-
-export const activeUsersTrend = {
-  days: ['05-10', '05-11', '05-12', '05-13', '05-14', '05-15', '05-16'],
-  values: [60.23, 66.18, 70.35, 80.21, 78.32, 85.66, 90.35],
-}
 
 export const salesTrend = {
   days: ['05-10', '05-11', '05-12', '05-13', '05-14', '05-15', '05-16'],
@@ -62,11 +102,4 @@ export const transactionRows = [
   { time: '10:24:31', user: '用户D****', region: '山东省济南市', amount: '¥987' },
   { time: '10:24:24', user: '用户E****', region: '四川省成都市', amount: '¥2,222' },
   { time: '10:24:17', user: '用户F****', region: '河南省郑州市', amount: '¥1,665' },
-]
-
-export const systemUsage = [
-  { label: 'CPU使用率', value: 32, color: '#2f8cff' },
-  { label: '内存使用率', value: 58, color: '#35d4ff' },
-  { label: '磁盘使用率', value: 45, color: '#39e7c8' },
-  { label: '网络带宽使用率', value: 68, color: '#64a4ff' },
 ]

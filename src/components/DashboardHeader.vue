@@ -8,6 +8,7 @@
           :key="item.path"
           class="menu-item"
           :class="{ active: route.path === item.path }"
+          :style="{ '--menu-glow': `url(${guangxiao})` }"
           type="button"
           @click="router.push(item.path)"
         >
@@ -19,8 +20,7 @@
       </nav>
 
       <div class="header-title">
-        <div class="title-main">智慧大屏数据总览</div>
-        <div class="title-sub">ECharts Visualization Dashboard</div>
+        <div class="title-main">ECharts 可视化大屏展示</div>
       </div>
 
       <nav class="menu menu-right">
@@ -29,6 +29,7 @@
           :key="item.path"
           class="menu-item"
           :class="{ active: route.path === item.path }"
+          :style="{ '--menu-glow': `url(${guangxiao})` }"
           type="button"
           @click="router.push(item.path)"
         >
@@ -47,6 +48,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DataLine, Monitor, Operation, House } from '@element-plus/icons-vue'
 import topBar from '@/assets/images/top_bar.png'
+import guangxiao from '../../image/guangxiao.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,12 +68,12 @@ const rightMenus = computed(() => menus.slice(2))
 .dashboard-header {
   position: relative;
   inset: auto;
-  height: var(--header-height);
+  height: vh(84);
   z-index: 20;
   pointer-events: none;
   overflow: hidden;
   background: var(--page-bg);
-  margin-top: 15px;
+  margin-top: vh(10);
 }
 
 .header-bg {
@@ -79,7 +81,7 @@ const rightMenus = computed(() => menus.slice(2))
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   object-position: center center;
 }
 
@@ -90,37 +92,37 @@ const rightMenus = computed(() => menus.slice(2))
   height: 100%;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: flex-start;
-  padding: 8px 28px 0;
+  align-items: center;
+  padding: 0 vw(28) 0;
   box-sizing: border-box;
 }
 
 .header-title {
   text-align: center;
-  margin-top: -2px;
+  margin-top: vh(-2);
 }
 
 .title-main {
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-  font-size: 38px;
+  font-size: vh(38);
   line-height: 1;
-  letter-spacing: 4px;
+  letter-spacing: vw(4);
   color: #f4fbff;
-  text-shadow: 0 0 22px rgba(54, 197, 255, 0.45);
+  text-shadow: 0 0 vh(22) rgba(54, 197, 255, 0.45);
 }
 
 .title-sub {
-  margin-top: 4px;
-  font-size: 12px;
-  letter-spacing: 8px;
+  margin-top: vh(4);
+  font-size: vh(12);
+  letter-spacing: vw(8);
   color: rgba(192, 231, 255, 0.72);
 }
 
 .menu {
   display: flex;
-  gap: 14px;
+  gap: vw(14);
   pointer-events: auto;
-  margin-top: -2px;
+  margin-top: vh(-2);
 }
 
 .menu-left {
@@ -132,33 +134,49 @@ const rightMenus = computed(() => menus.slice(2))
 }
 
 .menu-item {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-width: 160px;
-  padding: 14px 18px 13px;
-  border: 1px solid transparent;
-  border-radius: 999px;
+  justify-content: center;
+  gap: vw(10);
+  min-width: vw(260);
+  padding: vh(14) vw(18) vh(14);
+  border: none;
+  border-radius: 0;
   background: rgba(7, 23, 41, 0.12);
   color: rgba(224, 244, 255, 0.88);
-  font-size: 18px;
+  font-size: vh(24);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
-.menu-item:hover {
-  transform: translateY(-1px);
-  color: #ffffff;
+.menu-item.active {
+  color: #f4fbff;
 }
 
-.menu-item.active {
-  border-color: rgba(47, 228, 255, 0.46);
-  background: linear-gradient(180deg, rgba(47, 228, 255, 0.18), rgba(78, 165, 255, 0.08));
-  box-shadow: 0 0 0 1px rgba(47, 228, 255, 0.12) inset, 0 0 22px rgba(47, 228, 255, 0.12);
-  color: #ffffff;
+.menu-item.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: vh(-34);
+  height: vh(70);
+  background: var(--menu-glow) no-repeat center bottom / 100% 100%;
+  pointer-events: none;
+}
+
+.menu-item.active .menu-icon {
+  color: #2fe4ff;
 }
 
 .menu-icon {
-  font-size: 18px;
+  position: relative;
+  z-index: 1;
+  font-size: vh(24);
+}
+
+.menu-item span {
+  position: relative;
+  z-index: 1;
 }
 </style>
