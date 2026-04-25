@@ -32,13 +32,9 @@ defineProps({
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border: vw(1) solid var(--panel-border);
+  border: vw(1) solid #003969;
   border-radius: vw(18);
-  background: var(--panel-bg);
-  box-shadow:
-    0 0 0 vw(1) rgba(255, 255, 255, 0.02) inset,
-    0 0 vw(28) rgba(47, 228, 255, 0.05),
-    0 vh(18) vw(30) rgba(0, 0, 0, 0.22);
+  background: #01102c;
   overflow: hidden;
 }
 
@@ -48,10 +44,11 @@ defineProps({
   justify-content: space-between;
   padding: vh(12) vw(14) vh(10);
   position: relative;
+  z-index: 1;
 }
 
 .chart-box__title {
-  font-size: vh(18);
+  font-size: vw(22);
   letter-spacing: vw(1);
   padding-left: vw(14);
 }
@@ -62,17 +59,19 @@ defineProps({
   left: vw(14);
   top: vh(15);
   width: vw(4);
-  height: vh(18);
+  height: vh(24);
   border-radius: vw(999);
   background: linear-gradient(180deg, #2fe4ff, #2f8cff);
 }
 
 .chart-box__subtitle {
-  font-size: vh(12);
+  font-size: vw(12);
   color: var(--text-sub);
 }
 
 .chart-box__body {
+  position: relative;
+  z-index: 2;
   flex: 1 1 auto;
   min-height: 0;
   padding: 0 vw(10) vh(10);

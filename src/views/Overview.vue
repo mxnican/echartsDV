@@ -17,19 +17,34 @@
               </div>
               <div class="core-metric__label">{{ item.label }}</div>
               <div class="core-metric__value">
-                {{ item.value }}<small>{{ item.unit }}</small>
+                {{ item.value }}
               </div>
-              <div class="core-metric__delta">较昨日 <span>▲ {{ item.delta }}</span></div>
+              <div class="core-metric__delta">
+                <span class="core-metric__delta-label">较昨日</span>
+                <span class="core-metric__delta-value">▲ {{ item.delta }}</span>
+              </div>
             </div>
           </div>
         </ChartBox>
 
-        <ChartBox class="panel panel--middle" title="访问趋势分析" subtitle="PV / UV 双折线图">
+        <ChartBox class="panel panel--middle panel--trend" title="访问趋势分析" subtitle="">
           <div ref="pvUvTrendRef" class="chart-box__chart" />
         </ChartBox>
 
-        <ChartBox class="panel panel--tall" title="用户画像" subtitle="五维雷达图">
-          <div ref="profileRef" class="chart-box__chart" />
+        <ChartBox class="panel panel--bottom" title="用户画像">
+          <div class="user-profile-panel">
+            <div ref="profileRef" class="chart-box__chart chart-box__chart--radar user-profile-panel__chart" />
+            <div class="user-profile-panel__list">
+              <div
+                v-for="item in userProfileDetails"
+                :key="item.title"
+                class="user-profile-item"
+              >
+                <div class="user-profile-item__title">{{ item.title }}</div>
+                <div class="user-profile-item__status">{{ item.status }}</div>
+              </div>
+            </div>
+          </div>
         </ChartBox>
       </div>
 
@@ -60,15 +75,15 @@
       </div>
 
       <div class="column">
-        <ChartBox class="panel panel--middle" title="销售额趋势分析" subtitle="销售额 + 环比增长率">
+        <ChartBox class="panel panel--middle" title="销售额趋势分析">
           <div ref="salesTrendRef" class="chart-box__chart" />
         </ChartBox>
 
-        <ChartBox class="panel panel--middle" title="渠道占比" subtitle="环形饼图">
+        <ChartBox class="panel panel--middle" title="渠道占比">
           <div ref="channelRef" class="chart-box__chart" />
         </ChartBox>
 
-        <ChartBox class="panel panel--tall" title="实时交易动态" subtitle="滚动列表">
+        <ChartBox class="panel panel--tall" title="实时交易动态">
           <div class="trade-table">
             <div class="trade-table__head">
               <span>时间</span>
@@ -102,7 +117,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
-import { Coin, Document, TrendCharts, User, UserFilled } from '@element-plus/icons-vue'
+import { Coin, Document, UserFilled, View } from '@element-plus/icons-vue'
 import ChartBox from '@/components/ChartBox.vue'
 import centerBg from '@/assets/images/center_bg.png'
 import {
@@ -111,6 +126,7 @@ import {
   coreMetrics,
   pvUvTrend,
   salesTrend,
+  userProfileDetails,
   transactionRows,
   userProfileRadar,
 } from '@/utils/mockDashboard'
@@ -124,8 +140,8 @@ const charts = []
 const tradeRows = transactionRows
 
 const metricIconMap = {
-  'trend-up': TrendCharts,
-  user: User,
+  view: View,
+  user: UserFilled,
   order: Document,
   money: Coin,
 }
@@ -146,67 +162,202 @@ function createChart(el, option) {
 }
 
 function buildTrendOption() {
+  const pvColor = '#2f8cff'
+  const uvColor = '#16e6b4'
+
+  const formatWan = (value) => `${Number(value).toFixed(2)}万`
+
   return {
-    grid: { left: 40, right: 20, top: 36, bottom: 24, containLabel: true },
-    tooltip: { trigger: 'axis' },
-    legend: {
-      top: 4,
-      right: 8,
-      textStyle: { color: '#cfe7ff' },
-      itemWidth: 12,
-      itemHeight: 8,
+    backgroundColor: 'transparent',
+    grid: { left: 46, right: 28, top: 58, bottom: 20, containLabel: true },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(5, 20, 54, 0.96)',
+      borderColor: 'rgba(44, 145, 255, 0.46)',
+      borderWidth: 1,
+      padding: [12, 16],
+      textStyle: {
+        color: '#eaf6ff',
+        fontSize: 14,
+      },
+      extraCssText: 'box-shadow: 0 0 18px rgba(25, 126, 255, 0.22); border-radius: 10px;',
+      axisPointer: {
+        type: 'line',
+        lineStyle: {
+          color: 'rgba(47, 140, 255, 0.72)',
+          width: 1,
+        },
+      },
+      formatter(params) {
+        if (!params?.length) return ''
+        const [pvItem, uvItem] = params
+        const dot = (color) =>
+          `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};box-shadow:0 0 10px ${color};margin-right:8px;"></span>`
+
+        return `
+          <div style="min-width:140px;">
+            <div style="font-size:16px;font-weight:700;margin-bottom:10px;color:#d9ecff;">${pvItem.axisValue}</div>
+            <div style="display:flex;align-items:center;gap:6px;line-height:1.8;color:#dcecff;">
+              ${dot(pvColor)}<span>PV: ${formatWan(pvItem.data)}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;line-height:1.8;color:#dcecff;">
+              ${dot(uvColor)}<span>UV: ${formatWan(uvItem.data)}</span>
+            </div>
+          </div>
+        `
+      },
     },
+    legend: {
+      top: 12,
+      right: 18,
+      itemWidth: 12,
+      itemHeight: 3,
+      itemGap: 18,
+      textStyle: {
+        color: '#dcecff',
+        fontSize: 14,
+        fontWeight: 700,
+      },
+      icon: 'rect',
+    },
+    graphic: [
+      {
+        type: 'text',
+        left: 14,
+        top: 14,
+        style: {
+          text: '单位：万',
+          fill: '#cfe4ff',
+          fontSize: 14,
+          fontWeight: 700,
+        },
+      },
+    ],
     xAxis: {
       type: 'category',
+      boundaryGap: false,
       data: pvUvTrend.days,
-      axisLine: { lineStyle: { color: 'rgba(134, 198, 255, 0.35)' } },
-      axisLabel: { color: '#9ec7ff' },
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: 'rgba(56, 129, 255, 0.32)', width: 1 } },
+      axisLabel: {
+        color: '#d8e8ff',
+        fontSize: 12,
+        margin: 16,
+      },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: 'rgba(56, 129, 255, 0.08)',
+          type: 'solid',
+        },
+      },
     },
     yAxis: {
       type: 'value',
-      splitLine: { lineStyle: { color: 'rgba(134, 198, 255, 0.12)' } },
-      axisLabel: { color: '#9ec7ff' },
+      min: 0,
+      max: 150,
+      interval: 50,
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: 'rgba(56, 129, 255, 0.32)', width: 1 } },
+      axisLabel: {
+        color: '#d8e8ff',
+        fontSize: 12,
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(56, 129, 255, 0.15)',
+          width: 1,
+        },
+      },
     },
     series: [
       {
         name: 'PV',
         data: pvUvTrend.pv,
         type: 'line',
-        smooth: true,
+        smooth: 0.38,
         symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: { width: 3, color: '#2fe4ff' },
-        itemStyle: { color: '#2fe4ff' },
+        symbolSize: 7,
+        showSymbol: true,
+        lineStyle: {
+          width: 2.5,
+          color: pvColor,
+          shadowBlur: 12,
+          shadowColor: 'rgba(47, 140, 255, 0.42)',
+        },
+        itemStyle: {
+          color: pvColor,
+          borderColor: '#0f6ee6',
+          borderWidth: 1,
+        },
       },
       {
         name: 'UV',
         data: pvUvTrend.uv,
         type: 'line',
-        smooth: true,
+        smooth: 0.38,
         symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: { width: 3, color: '#6af0c8' },
-        itemStyle: { color: '#6af0c8' },
+        symbolSize: 7,
+        showSymbol: true,
+        lineStyle: {
+          width: 2.5,
+          color: uvColor,
+          shadowBlur: 12,
+          shadowColor: 'rgba(22, 230, 180, 0.38)',
+        },
+        itemStyle: {
+          color: uvColor,
+          borderColor: '#11b98f',
+          borderWidth: 1,
+        },
       },
     ],
+    animationDuration: 900,
+    animationEasing: 'cubicOut',
   }
 }
 
 function buildRadarOption() {
+  const radarColor = '#28d7ff'
+  const radarFill = 'rgba(45, 119, 255, 0.52)'
+  const radarEdge = 'rgba(58, 164, 255, 0.92)'
+
   return {
-    tooltip: { trigger: 'item' },
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(5, 20, 54, 0.96)',
+      borderColor: 'rgba(44, 145, 255, 0.46)',
+      borderWidth: 1,
+      textStyle: { color: '#eaf6ff' },
+    },
     radar: {
       indicator: userProfileRadar.indicator,
-      axisName: { color: '#d9ebff', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(134, 198, 255, 0.16)' } },
+      center: ['50%', '60%'],
+      radius: '68%',
+      startAngle: 90,
+      shape: 'polygon',
+      axisName: {
+        color: '#dcecff',
+        fontSize: 13,
+        fontWeight: 700,
+        formatter: (name) => name,
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'rgba(45, 177, 255, 0.42)',
+          width: 1,
+        },
+      },
       splitLine: {
         lineStyle: {
-          color: ['rgba(134, 198, 255, 0.12)', 'rgba(134, 198, 255, 0.18)', 'rgba(134, 198, 255, 0.24)'],
+          color: 'rgba(45, 177, 255, 0.22)',
+          width: 1,
         },
       },
       splitArea: {
         areaStyle: {
-          color: ['rgba(8, 20, 41, 0.12)', 'rgba(8, 20, 41, 0.24)'],
+          color: ['rgba(10, 28, 61, 0.06)', 'rgba(10, 28, 61, 0.1)'],
         },
       },
     },
@@ -217,13 +368,26 @@ function buildRadarOption() {
           {
             value: userProfileRadar.value,
             name: '用户画像',
-            areaStyle: { color: 'rgba(47, 228, 255, 0.18)' },
-            lineStyle: { color: '#2fe4ff', width: 2 },
-            itemStyle: { color: '#2fe4ff' },
+            areaStyle: { color: radarFill },
+            lineStyle: {
+              color: radarColor,
+              width: 2.5,
+              shadowBlur: 20,
+              shadowColor: 'rgba(40, 215, 255, 0.45)',
+            },
+            itemStyle: {
+              color: '#eafaff',
+              borderColor: radarEdge,
+              borderWidth: 1.5,
+            },
+            symbol: 'circle',
+            symbolSize: 7,
           },
         ],
       },
     ],
+    animationDuration: 800,
+    animationEasing: 'cubicOut',
   }
 }
 
@@ -338,11 +502,12 @@ onBeforeUnmount(() => {
 
 .dashboard-layout {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.12fr) minmax(0, 0.94fr);
   gap: vw(12);
   width: 100%;
   height: 100%;
   min-height: 0;
+  align-items: stretch;
 }
 
 .column {
@@ -354,7 +519,7 @@ onBeforeUnmount(() => {
 }
 
 .column-center {
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: vw(12);
 }
 
@@ -363,15 +528,22 @@ onBeforeUnmount(() => {
 }
 
 .panel--middle {
-  flex: 1.05;
+  flex: 1.15;
+}
+
+.panel--trend {
+  flex: 1.35;
 }
 
 .panel--tall {
+  flex: 1.15;
+}
+.panel--bottom {
   flex: 1.25;
 }
 
 .panel--summary {
-  flex: 0.95;
+  flex: 0.9;
 }
 
 .chart-box__chart {
@@ -380,27 +552,118 @@ onBeforeUnmount(() => {
   min-height: 0;
 }
 
+.chart-box__chart--radar {
+  padding-top: vh(10);
+  box-sizing: border-box;
+}
+
+.user-profile-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.32fr) minmax(0, 0.68fr);
+  gap: vw(8);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.user-profile-panel__chart {
+  min-height: 0;
+}
+
+.user-profile-panel__list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: vh(10);
+  min-height: 0;
+  padding: vh(10) vw(6) vh(20) vw(14);
+  box-sizing: border-box;
+}
+
+.user-profile-item {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: vh(38);
+  padding: 0 0 0 vw(12);
+}
+
+.user-profile-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: vw(4);
+  height: vh(18);
+  transform: translateY(-50%);
+  border-radius: vw(999);
+  background: linear-gradient(180deg, #38deff 0%, #2f8cff 100%);
+  box-shadow: 0 0 vw(10) rgba(47, 140, 255, 0.35);
+}
+
+.user-profile-item__title {
+  font-size: vw(15);
+  color: rgba(228, 240, 255, 0.9);
+  line-height: 1.2;
+}
+
+.user-profile-item__status {
+  font-size: vw(16);
+  font-weight: 700;
+  line-height: 1;
+  color: #1fe0a0;
+  padding-left: vw(4);
+}
+
 .core-metrics {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: vw(10);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: vw(12);
   height: 100%;
-  padding: 0 vw(8) vh(8);
+  padding: 0 vw(12) vh(12);
   box-sizing: border-box;
 }
 
 .core-metric {
-  border: vw(1) solid rgba(88, 183, 255, 0.18);
-  border-radius: vw(12);
-  background: linear-gradient(180deg, rgba(10, 28, 50, 0.92), rgba(7, 22, 41, 0.84));
-  padding: vh(12) vw(12) vh(10);
+  position: relative;
+  border: vw(1) solid rgba(49, 80, 255, 0.58);
+  border-radius: vw(10);
+  background:
+    linear-gradient(180deg, rgba(6, 28, 69, 0.95), rgba(4, 17, 45, 0.98)),
+    linear-gradient(180deg, rgba(13, 47, 104, 0.35), rgba(7, 22, 52, 0.18));
+  box-shadow:
+    0 0 0 vw(1) rgba(44, 171, 255, 0.12) inset,
+    0 0 vw(18) rgba(17, 112, 255, 0.16);
+  padding: vh(16) vw(12) vh(12);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: vw(8);
+  align-items: center;
+  justify-content: flex-start;
+  gap: vh(12);
+  overflow: hidden;
 }
 
-.core-metric__icon,
+.core-metric__icon {
+  width: vw(58);
+  height: vw(58);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00a4f5;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(47, 130, 255, 0.22), rgba(47, 68, 255, 0.02) 68%, transparent 70%),
+    rgba(6, 28, 69, 0.68);
+  border: vw(1) solid rgba(47, 120, 255, 0.35);
+  font-size: vw(32);
+  box-shadow:
+    0 0 0 vw(1) rgba(47, 113, 255, 0.08) inset,
+    0 0 vw(16) rgba(47, 95, 255, 0.22);
+  position: relative;
+  z-index: 1;
+}
+
 .summary-card__icon {
   width: vw(34);
   height: vw(34);
@@ -411,55 +674,85 @@ onBeforeUnmount(() => {
   color: var(--metric-accent);
   background: color-mix(in srgb, var(--metric-accent) 18%, transparent);
   border: vw(1) solid color-mix(in srgb, var(--metric-accent) 35%, transparent);
-  font-size: vh(16);
+  font-size: vw(16);
 }
 
-.core-metric__label,
+.core-metric__label {
+  position: relative;
+  z-index: 1;
+  font-size: vw(18);
+  color: rgba(214, 228, 245, 0.82);
+  letter-spacing: vw(1);
+  text-align: center;
+  padding-bottom: vh(12);
+}
+
 .summary-card__label {
-  font-size: vh(13);
+  font-size: vw(13);
   color: var(--text-sub);
 }
 
-.core-metric__value,
+.core-metric__value {
+  position: relative;
+  z-index: 1;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  line-height: 1;
+  color: #f4fbff;
+  text-shadow: 0 0 vh(10) rgba(47, 228, 255, 0.18);
+}
+
+.core-metric__value {
+  font-size: vw(24);
+  letter-spacing: vw(1);
+}
+
 .summary-card__value {
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
   line-height: 1;
   color: var(--metric-accent);
+  font-size: vw(26);
 }
 
-.core-metric__value {
-  font-size: vh(24);
+.core-metric__delta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: vw(12);
+  margin-top: auto;
+  font-size: vw(12);
+  padding-bottom: vh(10);
+  color: rgba(214, 228, 245, 0.78);
 }
 
-.summary-card__value {
-  font-size: vh(26);
+.core-metric__delta-label {
+  color: rgba(214, 228, 245, 0.72);
+  white-space: nowrap;
 }
 
-.core-metric__value small {
-  margin-left: vw(6);
-  font-family: 'Microsoft YaHei', sans-serif;
-  font-size: vh(12);
-  color: rgba(231, 245, 255, 0.72);
+.core-metric__delta-value {
+  color: #39e7c8;
+  font-weight: 700;
+  letter-spacing: vw(1);
+  white-space: nowrap;
 }
 
 .summary-card__value {
   margin-top: vh(8);
 }
 
-.core-metric__delta,
 .summary-card__delta {
-  font-size: vh(12);
+  font-size: vw(12);
   color: var(--text-sub);
 }
 
-.core-metric__delta span,
 .summary-card__delta span {
   color: #39e7c8;
   font-weight: 700;
 }
 
 .center-map-panel {
-  flex: 0 0 vh(520);
+  flex: 0 0 vh(620);
   min-height: 0;
   overflow: hidden;
   background: transparent;
@@ -510,7 +803,7 @@ onBeforeUnmount(() => {
   gap: vw(10);
   padding: 0 vw(6) vh(8);
   color: var(--text-sub);
-  font-size: vh(12);
+  font-size: vw(12);
 }
 
 .trade-table__viewport {
@@ -533,7 +826,7 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: vh(10) vw(6);
   border-bottom: vw(1) solid rgba(131, 181, 231, 0.12);
-  font-size: vh(12);
+  font-size: vw(12);
 }
 
 .trade-table__amount {

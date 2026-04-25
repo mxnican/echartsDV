@@ -8,8 +8,6 @@
 :root {
   color-scheme: dark;
   --page-bg: #000516;
-  --panel-bg: rgba(7, 22, 41, 0.74);
-  --panel-border: rgba(88, 183, 255, 0.24);
   --text-main: #eaf6ff;
   --text-sub: #a8c6e4;
 }

@@ -48,7 +48,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DataLine, Monitor, Operation, House } from '@element-plus/icons-vue'
 import topBar from '@/assets/images/top_bar.png'
-import guangxiao from '../../image/guangxiao.png'
+import guangxiao from '@/assets/images/guangxiao.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -104,7 +104,8 @@ const rightMenus = computed(() => menus.slice(2))
 
 .title-main {
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-  font-size: vh(38);
+  font-size: vw(40);
+  font-weight: 600;
   line-height: 1;
   letter-spacing: vw(4);
   color: #f4fbff;
@@ -113,7 +114,7 @@ const rightMenus = computed(() => menus.slice(2))
 
 .title-sub {
   margin-top: vh(4);
-  font-size: vh(12);
+  font-size: vw(12);
   letter-spacing: vw(8);
   color: rgba(192, 231, 255, 0.72);
 }
@@ -145,7 +146,7 @@ const rightMenus = computed(() => menus.slice(2))
   border-radius: 0;
   background: rgba(7, 23, 41, 0.12);
   color: rgba(224, 244, 255, 0.88);
-  font-size: vh(24);
+  font-size: vw(24);
   cursor: pointer;
   transition: all 0.25s ease;
 }
@@ -172,7 +173,7 @@ const rightMenus = computed(() => menus.slice(2))
 .menu-icon {
   position: relative;
   z-index: 1;
-  font-size: vh(24);
+  font-size: vw(24);
 }
 
 .menu-item span {

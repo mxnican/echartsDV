@@ -1,16 +1,14 @@
 export const coreMetrics = [
   {
-    label: '总访问量 PV',
-    value: '12,345,678',
-    unit: '次',
-    icon: 'trend-up',
+    label: '总访问量',
+    value: '1,345,678',
+    icon: 'view',
     accent: '#2fe4ff',
     delta: '12.45%',
   },
   {
-    label: '总用户数 UV',
-    value: '2,345,678',
-    unit: '人',
+    label: '总用户数',
+    value: '85,678',
     icon: 'user',
     accent: '#4ea5ff',
     delta: '8.21%',
@@ -18,15 +16,13 @@ export const coreMetrics = [
   {
     label: '订单总数',
     value: '56,789',
-    unit: '单',
     icon: 'order',
     accent: '#6af0c8',
     delta: '6.72%',
   },
   {
-    label: '销售额',
+    label: '销售额 (元)',
     value: '8,765,432',
-    unit: '元',
     icon: 'money',
     accent: '#ffd86b',
     delta: '11.23%',
@@ -35,8 +31,8 @@ export const coreMetrics = [
 
 export const pvUvTrend = {
   days: ['05-10', '05-11', '05-12', '05-13', '05-14', '05-15', '05-16'],
-  pv: [102, 96, 108, 121, 118, 113, 121],
-  uv: [34, 31, 38, 44, 43, 48, 52],
+  pv: [118.8, 96.4, 109.7, 130.5, 126.8, 101.2, 128.9],
+  uv: [36.2, 28.4, 46.8, 51.3, 52.7, 44.5, 60.8],
 }
 
 export const userProfileRadar = {
@@ -47,8 +43,16 @@ export const userProfileRadar = {
     { name: '客单价', max: 100 },
     { name: '新增用户增长', max: 100 },
   ],
-  value: [92, 78, 66, 72, 84],
+  value: [85, 78, 72, 65, 90],
 }
+
+export const userProfileDetails = [
+  { title: '活跃用户数', score: 85, status: '优秀', statusType: 'excellent' },
+  { title: '支付转化率', score: 78, status: '良好', statusType: 'good' },
+  { title: '复购率', score: 72, status: '良好', statusType: 'good' },
+  { title: '客单价', score: 65, status: '中等', statusType: 'medium' },
+  { title: '新增用户增长', score: 90, status: '优秀', statusType: 'excellent' },
+]
 
 export const centerSummary = [
   {
