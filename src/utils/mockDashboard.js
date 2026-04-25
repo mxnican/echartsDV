@@ -17,7 +17,7 @@ export const userProfileRadar = {
     { name: '支付转化率', max: 100 },
     { name: '复购率', max: 100 },
     { name: '客单价', max: 100 },
-    { name: '新用户增长', max: 100 },
+    { name: '新增用户增长', max: 100 },
   ],
   value: [92, 78, 66, 72, 84],
 }
@@ -56,12 +56,12 @@ export const channelShare = [
 ]
 
 export const transactionRows = [
-  { time: '10:24:53', user: '用户A****', region: '广东省深圳市', amount: '￥2,345' },
-  { time: '10:24:45', user: '用户B****', region: '江苏省南京市', amount: '￥1,234' },
-  { time: '10:24:38', user: '用户C****', region: '浙江省杭州市', amount: '￥3,456' },
-  { time: '10:24:31', user: '用户D****', region: '山东省济南市', amount: '￥987' },
-  { time: '10:24:24', user: '用户E****', region: '四川省成都市', amount: '￥2,222' },
-  { time: '10:24:17', user: '用户F****', region: '河南省郑州市', amount: '￥1,665' },
+  { time: '10:24:53', user: '用户A****', region: '广东省深圳市', amount: '¥2,345' },
+  { time: '10:24:45', user: '用户B****', region: '江苏省南京市', amount: '¥1,234' },
+  { time: '10:24:38', user: '用户C****', region: '浙江省杭州市', amount: '¥3,456' },
+  { time: '10:24:31', user: '用户D****', region: '山东省济南市', amount: '¥987' },
+  { time: '10:24:24', user: '用户E****', region: '四川省成都市', amount: '¥2,222' },
+  { time: '10:24:17', user: '用户F****', region: '河南省郑州市', amount: '¥1,665' },
 ]
 
 export const systemUsage = [

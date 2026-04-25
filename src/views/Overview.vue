@@ -53,7 +53,7 @@
           </div>
         </ChartBox>
 
-        <ChartBox title="近7日活跃用户数" subtitle="柱状图">
+        <ChartBox title="最近活跃用户数" subtitle="柱状图">
           <div ref="activeUsersRef" class="chart-box__chart" />
         </ChartBox>
       </div>
@@ -111,7 +111,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
 import ChartBox from '@/components/ChartBox.vue'
-import centerBg from '../../image/center_bg.png'
+import centerBg from '@/assets/images/center_bg.png'
 import {
   activeUsersTrend,
   centerSummary,
@@ -425,3 +425,233 @@ onBeforeUnmount(() => {
   charts.forEach((chart) => chart.dispose())
 })
 </script>
+
+<style lang="scss" scoped>
+.overview-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 10px 12px 12px;
+  box-sizing: border-box;
+}
+
+.dashboard-layout {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.column-left,
+.column-right {
+  flex: 1;
+}
+
+.column-center {
+  flex: 1.06;
+}
+
+.chart-box__chart {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.core-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  height: 100%;
+  padding: 0 8px 8px;
+  box-sizing: border-box;
+}
+
+.core-metric {
+  border: 1px solid rgba(88, 183, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(10, 28, 50, 0.92), rgba(7, 22, 41, 0.84));
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.core-metric__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--metric-accent);
+  background: color-mix(in srgb, var(--metric-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--metric-accent) 35%, transparent);
+  font-size: 11px;
+}
+
+.core-metric__label {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.core-metric__value {
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--metric-accent);
+}
+
+.core-metric__value small {
+  margin-left: 6px;
+  font-family: 'Microsoft YaHei', sans-serif;
+  font-size: 12px;
+  color: rgba(231, 245, 255, 0.72);
+}
+
+.center-map-panel {
+  flex: 1.5;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+}
+
+.center-map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  height: 100%;
+  padding: 0 8px 8px;
+  box-sizing: border-box;
+}
+
+.summary-card {
+  border: 1px solid rgba(88, 183, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(10, 28, 50, 0.9), rgba(7, 22, 41, 0.8));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 14px;
+}
+
+.summary-card__label {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.summary-card__value {
+  margin-top: 8px;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--summary-accent);
+}
+
+.trade-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0 8px 10px;
+  box-sizing: border-box;
+}
+
+.trade-table__head {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.3fr 0.8fr;
+  gap: 10px;
+  padding: 0 6px 8px;
+  color: var(--text-sub);
+  font-size: 12px;
+}
+
+.trade-table__viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.trade-table__track {
+  display: flex;
+  flex-direction: column;
+  animation: tradeScroll 16s linear infinite;
+}
+
+.trade-table__row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.3fr 0.8fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 6px;
+  border-bottom: 1px solid rgba(131, 181, 231, 0.12);
+  font-size: 12px;
+}
+
+.trade-table__amount {
+  color: #39e7c8;
+  font-weight: 700;
+}
+
+.system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+  height: 100%;
+  padding: 0 8px 8px;
+  box-sizing: border-box;
+}
+
+.system-item {
+  border: 1px solid rgba(88, 183, 255, 0.16);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(10, 28, 50, 0.88), rgba(7, 22, 41, 0.78));
+  padding: 8px 8px 6px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.system-item__chart {
+  flex: 1;
+  min-height: 110px;
+}
+
+.system-item__label {
+  text-align: center;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+@keyframes tradeScroll {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+</style>
