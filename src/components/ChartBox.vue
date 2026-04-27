@@ -33,7 +33,7 @@ defineProps({
   display: flex;
   flex-direction: column;
   border: vw(1) solid #003969;
-  border-radius: vw(18);
+  border-radius: vw(10);
   background: #01102c;
   overflow: hidden;
 }
@@ -74,7 +74,6 @@ defineProps({
   z-index: 2;
   flex: 1 1 auto;
   min-height: 0;
-  padding: 0 vw(10) vh(10);
   box-sizing: border-box;
 }
 </style>

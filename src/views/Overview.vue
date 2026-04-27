@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="overview-page">
     <section class="dashboard-layout">
       <div class="column">
@@ -21,7 +21,7 @@
               </div>
               <div class="core-metric__delta">
                 <span class="core-metric__delta-label">较昨日</span>
-                <span class="core-metric__delta-value">▲ {{ item.delta }}</span>
+                <span class="core-metric__delta-value">▲{{ item.delta }}</span>
               </div>
             </div>
           </div>
@@ -54,23 +54,7 @@
         </section>
 
         <ChartBox class="panel panel--summary" title="">
-          <div class="summary-grid">
-            <div
-              v-for="item in centerSummary"
-              :key="item.label"
-              class="summary-card"
-              :style="{ '--summary-accent': item.accent }"
-            >
-              <div class="summary-card__icon">
-                <el-icon>
-                  <component :is="summaryIconMap[item.icon]" />
-                </el-icon>
-              </div>
-              <div class="summary-card__label">{{ item.label }}</div>
-              <div class="summary-card__value">{{ item.value }}</div>
-              <div class="summary-card__delta">较昨日 <span>▲ {{ item.delta }}</span></div>
-            </div>
-          </div>
+          <CenterSummaryGrid :items="centerSummary" />
         </ChartBox>
       </div>
 
@@ -80,7 +64,20 @@
         </ChartBox>
 
         <ChartBox class="panel panel--middle" title="渠道占比">
-          <div ref="channelRef" class="chart-box__chart" />
+          <div class="channel-panel">
+            <div ref="channelRef" class="chart-box__chart chart-box__chart--channel" />
+            <div class="channel-panel__legend">
+              <div
+                v-for="item in channelLegendItems"
+                :key="item.label"
+                class="channel-panel__legend-item"
+              >
+                <span class="channel-panel__legend-swatch" :style="{ background: item.color }" />
+                <span class="channel-panel__legend-label">{{ item.label }}</span>
+                <span class="channel-panel__legend-value">{{ item.value }}</span>
+              </div>
+            </div>
+          </div>
         </ChartBox>
 
         <ChartBox class="panel panel--tall" title="实时交易动态">
@@ -119,10 +116,10 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
 import { Coin, Document, UserFilled, View } from '@element-plus/icons-vue'
 import ChartBox from '@/components/ChartBox.vue'
+import CenterSummaryGrid from '@/components/CenterSummaryGrid.vue'
 import centerBg from '@/assets/images/center_bg.png'
 import {
   centerSummary,
-  channelShare,
   coreMetrics,
   pvUvTrend,
   salesTrend,
@@ -136,6 +133,7 @@ const profileRef = ref(null)
 const salesTrendRef = ref(null)
 const channelRef = ref(null)
 const charts = []
+let trendScrollTimer = null
 
 const tradeRows = transactionRows
 
@@ -146,12 +144,13 @@ const metricIconMap = {
   money: Coin,
 }
 
-const summaryIconMap = {
-  user: UserFilled,
-  order: Document,
-  money: Coin,
-  active: UserFilled,
-}
+const channelLegendItems = [
+  { label: '线上商城', value: '35.42%', color: '#3b8cff' },
+  { label: 'APP', value: '25.11%', color: '#39d2ff' },
+  { label: '线下门店', value: '18.33%', color: '#ffbe6a' },
+  { label: '小程序', value: '11.23%', color: '#8f67ff' },
+  { label: '合作渠道', value: '9.91%', color: '#39e7c8' },
+]
 
 function createChart(el, option) {
   if (!el) return null
@@ -161,11 +160,33 @@ function createChart(el, option) {
   return chart
 }
 
+function startTrendAutoScroll(chart, labels, windowSize = 8, interval = 2800) {
+  if (!chart || labels.length <= windowSize) return
+
+  let startIndex = 0
+  const lastStartIndex = labels.length - windowSize
+
+  chart.dispatchAction({
+    type: 'dataZoom',
+    startValue: labels[0],
+    endValue: labels[windowSize - 1],
+  })
+
+  trendScrollTimer = window.setInterval(() => {
+    startIndex = startIndex >= lastStartIndex ? 0 : startIndex + 1
+    chart.dispatchAction({
+      type: 'dataZoom',
+      startValue: labels[startIndex],
+      endValue: labels[startIndex + windowSize - 1],
+    })
+  }, interval)
+}
+
 function buildTrendOption() {
   const pvColor = '#2f8cff'
   const uvColor = '#16e6b4'
 
-  const formatWan = (value) => `${Number(value).toFixed(2)}万`
+  const formatWan = (value) => `${Number(value).toFixed(2)}万元`
 
   return {
     backgroundColor: 'transparent',
@@ -223,10 +244,10 @@ function buildTrendOption() {
     graphic: [
       {
         type: 'text',
-        left: 14,
-        top: 14,
+        left: 76,
+        top: 16,
         style: {
-          text: '单位：万',
+          text: '单位：万元',
           fill: '#cfe4ff',
           fontSize: 14,
           fontWeight: 700,
@@ -252,6 +273,23 @@ function buildTrendOption() {
         },
       },
     },
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: 0,
+        filterMode: 'none',
+        startValue: pvUvTrend.days[0],
+        endValue: pvUvTrend.days[7],
+      },
+      {
+        type: 'slider',
+        show: false,
+        xAxisIndex: 0,
+        filterMode: 'none',
+        startValue: pvUvTrend.days[0],
+        endValue: pvUvTrend.days[7],
+      },
+    ],
     yAxis: {
       type: 'value',
       min: 0,
@@ -314,6 +352,7 @@ function buildTrendOption() {
     ],
     animationDuration: 900,
     animationEasing: 'cubicOut',
+    animationDurationUpdate: 500,
   }
 }
 
@@ -393,11 +432,11 @@ function buildRadarOption() {
 
 function buildSalesTrendOption() {
   return {
-    grid: { left: 46, right: 46, top: 38, bottom: 26, containLabel: true },
+    grid: { left: 46, right: 46, top: 44, bottom: 26, containLabel: true },
     tooltip: { trigger: 'axis' },
     legend: {
-      top: 6,
-      right: 12,
+      top: 8,
+      left: '43%',
       textStyle: { color: '#cfe7ff' },
     },
     xAxis: {
@@ -412,13 +451,14 @@ function buildSalesTrendOption() {
         name: '万元',
         nameTextStyle: { color: '#9ec7ff' },
         axisLabel: { color: '#9ec7ff' },
-        splitLine: { lineStyle: { color: 'rgba(134, 198, 255, 0.12)' } },
+        splitLine: { show: false },
       },
       {
         type: 'value',
         name: '%',
         nameTextStyle: { color: '#9ec7ff' },
         axisLabel: { color: '#9ec7ff' },
+        splitLine: { show: false },
       },
     ],
     series: [
@@ -451,42 +491,67 @@ function buildSalesTrendOption() {
 }
 
 function buildChannelOption() {
+  const chartData = [
+    { name: '线上商城', value: 35.42, itemStyle: { color: '#3b8cff' } },
+    { name: 'APP', value: 25.11, itemStyle: { color: '#39d2ff' } },
+    { name: '线下门店', value: 18.33, itemStyle: { color: '#ffbe6a' } },
+    { name: '小程序', value: 11.23, itemStyle: { color: '#8f67ff' } },
+    { name: '合作渠道', value: 9.91, itemStyle: { color: '#39e7c8' } },
+  ]
+
   return {
     tooltip: { trigger: 'item' },
-    legend: {
-      orient: 'vertical',
-      right: 10,
-      top: 'middle',
-      textStyle: { color: '#d9ebff' },
-    },
+    legend: { show: false },
     series: [
       {
         type: 'pie',
-        radius: ['38%', '68%'],
-        center: ['33%', '50%'],
-        label: { color: '#fff' },
+        radius: ['34%', '58%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: true,
+        minAngle: 6,
+        label: {
+          show: true,
+          position: 'outside',
+          formatter: '{b}',
+          color: '#eaf6ff',
+          fontSize: 11,
+          fontWeight: 700,
+          padding: [0, 0, 0, 0],
+          distance: 4,
+          distanceToLabelLine: 1,
+        },
+        labelLine: {
+          show: true,
+          length: 10,
+          length2: 8,
+          lineStyle: { color: 'inherit', width: 1.5 },
+        },
         itemStyle: { borderColor: '#081429', borderWidth: 4 },
-        data: channelShare,
+        data: chartData,
       },
     ],
-    color: ['#2f8cff', '#35d4ff', '#ffb86b', '#8f67ff', '#39e7c8'],
+    color: ['#3b8cff', '#39d2ff', '#ffbe6a', '#8f67ff', '#39e7c8'],
   }
 }
-
 function resizeCharts() {
   charts.forEach((chart) => chart.resize())
 }
 
 onMounted(() => {
-  createChart(pvUvTrendRef.value, buildTrendOption())
+  const trendChart = createChart(pvUvTrendRef.value, buildTrendOption())
   createChart(profileRef.value, buildRadarOption())
   createChart(salesTrendRef.value, buildSalesTrendOption())
+  startTrendAutoScroll(trendChart, pvUvTrend.days)
   createChart(channelRef.value, buildChannelOption())
   window.addEventListener('resize', resizeCharts)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeCharts)
+  if (trendScrollTimer) {
+    window.clearInterval(trendScrollTimer)
+    trendScrollTimer = null
+  }
   charts.forEach((chart) => chart.dispose())
 })
 </script>
@@ -543,7 +608,7 @@ onBeforeUnmount(() => {
 }
 
 .panel--summary {
-  flex: 0.9;
+  flex: 0.94;
 }
 
 .chart-box__chart {
@@ -552,9 +617,62 @@ onBeforeUnmount(() => {
   min-height: 0;
 }
 
+.chart-box__chart--channel {
+  flex: 0 0 58%;
+}
+
 .chart-box__chart--radar {
   padding-top: vh(10);
   box-sizing: border-box;
+}
+
+.channel-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: vw(14);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: vh(8) vw(10) vh(10) vw(8);
+  box-sizing: border-box;
+}
+
+.channel-panel__legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: vh(16);
+  min-width: 0;
+  padding-right: vw(10);
+}
+
+.channel-panel__legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: vw(10);
+  color: #dcecff;
+  font-size: vw(14);
+  line-height: 1;
+}
+
+.channel-panel__legend-swatch {
+  width: vw(10);
+  height: vw(10);
+  border-radius: vw(3);
+  box-shadow: 0 0 vw(10) rgba(47, 140, 255, 0.18);
+}
+
+.channel-panel__legend-label {
+  white-space: nowrap;
+}
+
+.channel-panel__legend-value {
+  color: rgba(228, 240, 255, 0.8);
+  min-width: vw(58);
+  text-align: right;
 }
 
 .user-profile-panel {
@@ -647,19 +765,11 @@ onBeforeUnmount(() => {
 .core-metric__icon {
   width: vw(58);
   height: vw(58);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #00a4f5;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(47, 130, 255, 0.22), rgba(47, 68, 255, 0.02) 68%, transparent 70%),
-    rgba(6, 28, 69, 0.68);
-  border: vw(1) solid rgba(47, 120, 255, 0.35);
   font-size: vw(32);
-  box-shadow:
-    0 0 0 vw(1) rgba(47, 113, 255, 0.08) inset,
-    0 0 vw(16) rgba(47, 95, 255, 0.22);
   position: relative;
   z-index: 1;
 }
@@ -803,7 +913,7 @@ onBeforeUnmount(() => {
   gap: vw(10);
   padding: 0 vw(6) vh(8);
   color: var(--text-sub);
-  font-size: vw(12);
+  font-size: vw(14);
 }
 
 .trade-table__viewport {
@@ -844,3 +954,4 @@ onBeforeUnmount(() => {
   }
 }
 </style>
+
